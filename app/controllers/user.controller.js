@@ -1,4 +1,4 @@
-let UserService = require("../services/user.service");
+const UserService = require("../services/user.service");
 const crypto = require('crypto');
 
 const getNonce = async function (req, res, next) {

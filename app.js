@@ -41,9 +41,11 @@ app.set('port', 3080);
 app.set('json spaces', 2);
 
 const UserRouter = require("./app/routes/user.router");
+const ChampionshipRouter = require("./app/routes/championship.router");
 
 // DEFINE ALL THE MAJOR ROUTES
 app.use("/users", UserRouter);
+app.use("/championships", ChampionshipRouter);
 
 // START LISTENING
 app.listen(app.get('port'), () => {
