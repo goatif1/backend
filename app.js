@@ -40,12 +40,16 @@ app.use(cookieParser(9));
 app.set('port', 3080);
 app.set('json spaces', 2);
 
+const AuthRouter = require("./app/routes/auth.router");
 const UserRouter = require("./app/routes/user.router");
 const ChampionshipRouter = require("./app/routes/championship.router");
+const OrganizationRouter = require("./app/routes/organization.router");
 
 // DEFINE ALL THE MAJOR ROUTES
+app.use("/auth", AuthRouter);
 app.use("/users", UserRouter);
 app.use("/championships", ChampionshipRouter);
+app.use("/organizations", OrganizationRouter);
 
 // START LISTENING
 app.listen(app.get('port'), () => {

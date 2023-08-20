@@ -56,8 +56,8 @@ const getNonce = async function (address){
                     address: address
                 }
             })
-            .then((nonce) => {
-                resolve(nonce && nonce.length > 0 ? nonce[0] : null);
+            .then((users_nonces) => {
+                resolve(users_nonces && users_nonces.length > 0 ? users_nonces[0].nonce : null);
             })
             .catch((err) => {
                 reject(err);
