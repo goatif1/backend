@@ -46,41 +46,57 @@ const createOrganization = async (admin_public_address, league_name, league_desc
             );
         `;
 
-        let transaction = DBConn.transaction();
+        let transaction = await DBConn.transaction();
 
-        return new Promise( function(resolve, reject) {
-            DBConn.query(sqlQuery, {
+        let insert_organization_result = await DBConn.query(sqlQuery, {
+            type: QueryTypes.INSERT,
+            bind: {
+                name: league_name,
+                description: league_description
+            },
+            transaction: transaction
+        });
+
+        if (insert_organization_result && insert_organization_result.length > 0){
+            console.log("INSERT ORGANIZATION result: ", insert_organization_result);
+            let organization_id = insert_organization_result[0];
+
+            sqlQuery = `
+                INSERT INTO organization_admin (
+                    id_organization,
+                    address_admin
+                ) VALUES (
+                    $id,
+                    $address
+                );
+            `;
+            let insert_organization_admin = await DBConn.query(sqlQuery, {
                 type: QueryTypes.INSERT,
                 bind: {
-                    name: league_name,
-                    description: league_description
+                    id: organization_id,
+                    address: admin_public_address
                 },
                 transaction: transaction
-            })
-            .then((organization) => {
-                console.log("ORGANIZATION CREATED: ", organization);
-                sqlQuery = `
-                    INSERT INTO organization_admin (
-                        id_organization,
-                        address_admin
-                    ) VALUES (
-                        $id,
-                        $address
-                    );
-                `;
-                transaction.rollback();
-
-            })
-            .catch((err) => {
-                transaction.rollback();
-                reject(err);
-                throw Error("OrganizationService. Error while getting organizations data. " + err);
             });
-        });
+            console.log("INSERT ADMIN result: ", insert_organization_admin);
+
+            if (insert_organization_admin && insert_organization_admin.length > 0){
+                await transaction.commit();
+                return true;
+            } else {
+                await transaction.rollback();
+                throw Error("OrganizationService. Error while getting creating league");
+            }
+
+
+        } else {
+            await transaction.rollback();
+            throw Error("OrganizationService. Error while getting creating league");
+        }
 
     } catch (e) {
         // log errors
-        throw Error("Error while getting organizations data");
+        throw Error("OrganizationService. Error while getting creating league");
     }
 }
 
