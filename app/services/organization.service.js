@@ -32,6 +32,42 @@ const getAllOrgnanizations = async function (){
     }
 }
 
+const getUserOrgnanizations = async function (public_address){
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT
+                organization.id as id,
+                organization.name as name,
+                organization.description as description,
+                organization.dateofcreation as dateofcreation
+            FROM organization
+            LEFT JOIN organization_admin ON organization_admin.id_organization = organization.id
+            WHERE organization_admin.address_admin = $address;
+        `;
+
+        return new Promise( function(resolve, reject) {
+            DBConn.query(sqlQuery, {
+                type: QueryTypes.SELECT,
+                bind: {
+                    address: public_address
+                }
+            })
+            .then((organizations) => {
+                resolve(organizations && organizations.length > 0 ? organizations : []);
+            })
+            .catch((err) => {
+                reject(err);
+                throw Error("OrganizationService. Error while getting user organizations data. " + err);
+            });
+        });
+
+    } catch (e) {
+        // log errors
+        throw Error("Error while getting user organizations data");
+    }
+}
+
 // POST
 const createOrganization = async (admin_public_address, league_name, league_description) => {
     try {
@@ -58,7 +94,6 @@ const createOrganization = async (admin_public_address, league_name, league_desc
         });
 
         if (insert_organization_result && insert_organization_result.length > 0){
-            console.log("INSERT ORGANIZATION result: ", insert_organization_result);
             let organization_id = insert_organization_result[0];
 
             sqlQuery = `
@@ -78,29 +113,29 @@ const createOrganization = async (admin_public_address, league_name, league_desc
                 },
                 transaction: transaction
             });
-            console.log("INSERT ADMIN result: ", insert_organization_admin);
 
             if (insert_organization_admin && insert_organization_admin.length > 0){
                 await transaction.commit();
                 return true;
             } else {
                 await transaction.rollback();
-                throw Error("OrganizationService. Error while getting creating league");
+                throw Error("OrganizationService. Error while creating league");
             }
 
 
         } else {
             await transaction.rollback();
-            throw Error("OrganizationService. Error while getting creating league");
+            throw Error("OrganizationService. Error while creating league");
         }
 
     } catch (e) {
         // log errors
-        throw Error("OrganizationService. Error while getting creating league");
+        throw Error("OrganizationService. Error while creating league");
     }
 }
 
 module.exports = {
     getAllOrgnanizations,
+    getUserOrgnanizations,
     createOrganization
 }
