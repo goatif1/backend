@@ -1,14 +1,12 @@
 FROM node:16
 
-WORKDIR /opt/goatifi/backend
+WORKDIR /opt/goatif1/backend
 
-COPY package*.json ./
+COPY . .
 
 RUN npm install
 
 RUN npm install -g nodemon
-
-COPY . .
 
 EXPOSE 3080
 
