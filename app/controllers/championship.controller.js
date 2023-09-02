@@ -9,6 +9,16 @@ const getAllChampionships = async function (req, res, next) {
     }
 }
 
+const getOrganizationChampionships = async function (req, res, next) {
+    try {
+        let championships = await ChampionshipService.getOrganizationChampionships(req.params.id_organization);
+        return res.status(200).json(championships);
+    } catch (e) {
+        return res.status(400).json({ status: 400, message: e.message });
+    }
+}
+
 module.exports = {
-    getAllChampionships
+    getAllChampionships,
+    getOrganizationChampionships
 }

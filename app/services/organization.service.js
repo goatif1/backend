@@ -68,6 +68,44 @@ const getUserOrgnanizations = async function (public_address){
     }
 }
 
+const getOrganization = async function (id_organization){
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT
+                organization.id as id,
+                organization.name as name,
+                organization.description as description,
+                organization.dateofcreation as dateofcreation,
+                organization_admin.address_admin as admin
+            FROM organization
+            LEFT JOIN organization_admin ON organization_admin.id_organization = organization.id
+            WHERE organization.id = $id_organization
+            ;
+        `;
+
+        return new Promise( function(resolve, reject) {
+            DBConn.query(sqlQuery, {
+                type: QueryTypes.SELECT,
+                bind: {
+                    id_organization: id_organization
+                }
+            })
+            .then((organization) => {
+                resolve(organization && organization.length > 0 ? organization[0] : null);
+            })
+            .catch((err) => {
+                reject(err);
+                throw Error("OrganizationService. Error while getting organization data. " + err);
+            });
+        });
+
+    } catch (e) {
+        // log errors
+        throw Error("Error while getting organization data");
+    }
+}
+
 // POST
 const createOrganization = async (admin_public_address, league_name, league_description) => {
     try {
@@ -137,5 +175,6 @@ const createOrganization = async (admin_public_address, league_name, league_desc
 module.exports = {
     getAllOrgnanizations,
     getUserOrgnanizations,
+    getOrganization,
     createOrganization
 }
