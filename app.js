@@ -44,12 +44,14 @@ const AuthRouter = require("./app/routes/auth.router");
 const UserRouter = require("./app/routes/user.router");
 const ChampionshipRouter = require("./app/routes/championship.router");
 const OrganizationRouter = require("./app/routes/organization.router");
+const InvitationRouter = require("./app/routes/invitation.router");
 
 // DEFINE ALL THE MAJOR ROUTES
 app.use("/auth", AuthRouter);
 app.use("/users", UserRouter);
 app.use("/championships", ChampionshipRouter);
 app.use("/organizations", OrganizationRouter);
+app.use("/invitations", InvitationRouter);
 
 // START LISTENING
 app.listen(app.get('port'), () => {
