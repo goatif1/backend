@@ -21,8 +21,10 @@ const getOrganizationChampionships = async function (req, res, next) {
 const createChampionship = async (req, res, next) => {
     try {
         let organization_id = req.params.id_organization;
-        
-        let created = await ChampionshipService.createChampionship();
+
+        let created = await ChampionshipService.createChampionship(req.address, organization_id, req.body);
+
+        return res.status(200).json({status: "Success"});
     } catch (e) {
         return res.status(400).json({ status: 400, message: "Error creating championship" });
     }

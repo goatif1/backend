@@ -172,9 +172,40 @@ const createOrganization = async (admin_public_address, league_name, league_desc
     }
 }
 
+// Checks
+const isOrganizationAdmin = async (user_address, organization_id) => {
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT
+                id_organization
+            FROM organization_admin
+            WHERE 
+                id_organization = $organization_id 
+                AND address_admin = $user_address;
+        `;
+
+        const admin = await DBConn.query(sqlQuery, {
+            type: QueryTypes.SELECT,
+            bind: {
+                organization_id: organization_id,
+                user_address: user_address
+            }
+        });
+
+        return admin.length > 0;
+
+    } catch(e) {
+        throw Error("Error checking if user is admin of the organization")
+    }
+}
+
 module.exports = {
     getAllOrgnanizations,
     getUserOrgnanizations,
     getOrganization,
-    createOrganization
+
+    createOrganization,
+
+    isOrganizationAdmin
 }
