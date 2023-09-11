@@ -109,7 +109,6 @@ const createChampionship = async (admin_address, organization_id, championship_d
                 transction: transction
             });
 
-            console.log("RESULT: ", createChampionship_res);
             let id_championship = createChampionship_res[0];
 
             for (const invitation_code of championship_data.invitationCodes){
@@ -134,7 +133,61 @@ const createChampionship = async (admin_address, organization_id, championship_d
                 }
 
                 // add the user to the championship
-                sqlQuery = ``;
+                sqlQuery = `
+                    INSERT INTO championship_driver (
+                        id_championship,
+                        address_driver,
+                        total_points
+                    ) VALUES (
+                        $id_championship,
+                        $address,
+                        0
+                    );
+                `;
+                await DBConn.query(sqlQuery, {
+                    type: QueryTypes.INSERT,
+                    transction: transction,
+                    bind: {
+                        id_championship: id_championship,
+                        address: user
+                    }
+                });
+
+                if (championship_data.adminIsDriver){
+                    // Admin that is sending the request, will run as driver too
+                    await DBConn.query(sqlQuery, {
+                        type: QueryTypes.INSERT,
+                        transction: transction,
+                        bind: {
+                            id_championship: id_championship,
+                            address: admin_address
+                        }
+                    });
+                }
+
+                sqlQuery = `
+                    INSERT INTO team (
+                        id_championship,
+                        name,
+                        total_points
+                    ) VALUES (
+                        $id_championship,
+                        $name,
+                        0
+                    );
+                `;
+
+                // Create the teams
+                for (const team of championship_data.teams){
+                    await DBConn.query(sqlQuery, {
+                        type: QueryTypes.INSERT,
+                        transaction: transction,
+                        bind: {
+                            id_championship: id_championship,
+                            name: team
+                        }
+                    });
+                }
 
             }
 
@@ -146,7 +199,7 @@ const createChampionship = async (admin_address, organization_id, championship_d
             DBConn.close();
         }
 
-        return true;
+        return false;
 
     } catch (e){
         console.log("EXCEPTION SERVICE: ", e);
