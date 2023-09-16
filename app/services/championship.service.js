@@ -80,6 +80,127 @@ const getOrganizationChampionships = async function (id_organization){
     }
 }
 
+const getChampionship = async function (id_championship){
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT
+                championship.id as id,
+                championship.name as name,
+                championship.description as description,
+                championship.dateofcreation as dateofcreation,
+                championship.status as championship_status,
+                championship.id_organization as id_organization,
+                organization.name as organization_name
+            FROM championship
+            LEFT JOIN organization ON championship.id_organization = organization.id
+            WHERE championship.id = $id_championship;
+        `;
+
+        return new Promise( function(resolve, reject) {
+            DBConn.query(sqlQuery, {
+                type: QueryTypes.SELECT,
+                bind: {
+                    id_championship: id_championship
+                }
+            })
+            .then((championships) => {
+                resolve(championships && championships.length > 0 ? championships : []);
+            })
+            .catch((err) => {
+                reject(err);
+                throw Error("ChampionshipService. Error while getting championship. " + err);
+            });
+        });
+
+    } catch (e) {
+        // log errors
+        throw Error("Error while getting championship");
+    }
+}
+
+const getChampionshipDriverStanding = async function (id_championship){
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT
+                championship_driver.address_driver as address_driver,
+                championship_driver.total_points as total_points,
+
+                user.nickname as nickname,
+                user.url_image as user_image
+            
+            FROM championship_driver
+            LEFT JOIN user ON user.address = championship_driver.address_driver
+
+            WHERE championship_driver.id_championship = $id_championship
+            
+            ORDER BY total_points DESC;
+        `;
+
+        return new Promise( function(resolve, reject) {
+            DBConn.query(sqlQuery, {
+                type: QueryTypes.SELECT,
+                bind: {
+                    id_championship: id_championship
+                }
+            })
+            .then((drivers) => {
+                resolve(drivers);
+            })
+            .catch((err) => {
+                reject(err);
+                throw Error("ChampionshipService. Error while getting championship driver standing. " + err);
+            });
+        });
+
+    } catch (e) {
+        // log errors
+        throw Error("Error while getting championship driver standing");
+    }
+}
+
+const getChampionshipTeamStanding = async function (id_championship){
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT
+                team.id as team_id,
+                team.total_points as total_points,
+                team.name as name,
+                team.description as description,
+                team.address_driver_1 as address_driver_1,
+                team.address_driver_2 as address_driver_2
+            
+            FROM team
+
+            WHERE team.id_championship = $id_championship
+            
+            ORDER BY total_points DESC;
+        `;
+
+        return new Promise( function(resolve, reject) {
+            DBConn.query(sqlQuery, {
+                type: QueryTypes.SELECT,
+                bind: {
+                    id_championship: id_championship
+                }
+            })
+            .then((teams) => {
+                resolve(teams);
+            })
+            .catch((err) => {
+                reject(err);
+                throw Error("ChampionshipService. Error while getting championship team standings. " + err);
+            });
+        });
+
+    } catch (e) {
+        // log errors
+        throw Error("Error while getting championship team standings");
+    }
+}
+
 const createChampionship = async (admin_address, organization_id, championship_data) => {
     try {
         console.log("CREATE CHAMPIONSHIP IN SERVICE");
@@ -210,6 +331,10 @@ const createChampionship = async (admin_address, organization_id, championship_d
 module.exports = {
     getAllChampionship,
     getOrganizationChampionships,
+
+    getChampionship,
+    getChampionshipDriverStanding,
+    getChampionshipTeamStanding,
 
     createChampionship
 }

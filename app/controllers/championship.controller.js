@@ -18,6 +18,33 @@ const getOrganizationChampionships = async function (req, res, next) {
     }
 }
 
+const getChampionship = async (req, res, next) => {
+    try {
+        let championship = await ChampionshipService.getChampionship(req.params.id_championship);
+        return res.status(200).json(championship);
+    } catch (e){
+        return res.status(400).json({ status: 400, message: "Error getting championship" });
+    }
+}
+
+const getChampionshipDriverStanding = async (req, res, next) => {
+    try {
+        let standing = await ChampionshipService.getChampionshipDriverStanding(req.params.id_championship);
+        return res.status(200).json(standing);
+    } catch (e){
+        return res.status(400).json({ status: 400, message: "Error getting championship drivers standing" });
+    }
+}
+
+const getChampionshipTeamStanding = async (req, res, next) => {
+    try {
+        let standing = await ChampionshipService.getChampionshipTeamStanding(req.params.id_championship);
+        return res.status(200).json(standing);
+    } catch (e){
+        return res.status(400).json({ status: 400, message: "Error getting championship teams standing" });
+    }
+}
+
 const createChampionship = async (req, res, next) => {
     try {
         let organization_id = req.params.id_organization;
@@ -33,5 +60,10 @@ const createChampionship = async (req, res, next) => {
 module.exports = {
     getAllChampionships,
     getOrganizationChampionships,
+
+    getChampionship,
+    getChampionshipDriverStanding,
+    getChampionshipTeamStanding,
+
     createChampionship
 }
