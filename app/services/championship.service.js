@@ -105,7 +105,7 @@ const getChampionship = async function (id_championship){
                 }
             })
             .then((championships) => {
-                resolve(championships && championships.length > 0 ? championships : []);
+                resolve(championships && championships.length > 0 ? championships[0] : null);
             })
             .catch((err) => {
                 reject(err);
