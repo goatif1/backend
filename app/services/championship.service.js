@@ -201,6 +201,102 @@ const getChampionshipTeamStanding = async function (id_championship){
     }
 }
 
+const getChampionshipRaces = async function (id_championship){
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT
+                race.id as id_race,
+                race.id_championship as id_championship,
+                race.id_circuit as id_circuit,
+                circuit.name as circuit_name,
+                circuit.description as circuit_description,
+                circuit.country as circuit_country,
+                circuit.lat as circuit_lat,
+                circuit.lon as circuit_lon,
+                circuit_image.url_image as circuit_image,
+                race.name as name,
+                race.description as description,
+                race.type as race_type,
+                race.finished as race_finished,
+                race.datetime_utc as race_datetime_utc
+
+            FROM race
+            LEFT JOIN circuit ON circuit.id = race.id_circuit
+            LEFT JOIN circuit_image ON circuit_image.id_circuit = circuit.id
+
+            WHERE race.id_championship = $id_championship
+            
+            ORDER BY race.datetime_utc;
+        `;
+
+        console.log("SQL QUERY: ", sqlQuery);
+
+        return new Promise( function(resolve, reject) {
+            DBConn.query(sqlQuery, {
+                type: QueryTypes.SELECT,
+                bind: {
+                    id_championship: id_championship
+                }
+            })
+            .then((races) => {
+                resolve(races);
+            })
+            .catch((err) => {
+                reject(err);
+                throw Error("ChampionshipService. Error while getting championship races. " + err);
+            });
+        });
+
+    } catch (e) {
+        // log errors
+        throw Error("Error while getting championship races");
+    }
+}
+
+const getChampionshipRacesResults = async function (id_championship){
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT
+                race.id as id_race,
+                race_result.address_driver as address_driver,
+                race_result.position as position,
+                race_result.points as points,
+                race_result.fastest_lap as fastest_lap,
+                race_result.dnf as dnf,
+                race_result.norun as norun
+            FROM race
+            LEFT JOIN race_result ON race_result.id_race = race.id
+            WHERE race.id_championship = $id_championship
+            AND race.type = $RACE_TYPE_CLASSIC
+
+            UNION
+            
+        `;
+
+        return new Promise( function(resolve, reject) {
+            DBConn.query(sqlQuery, {
+                type: QueryTypes.SELECT,
+                bind: {
+                    id_championship: id_championship
+                }
+            })
+            .then((races) => {
+                resolve(races);
+            })
+            .catch((err) => {
+                reject(err);
+                throw Error("ChampionshipService. Error while getting championship races. " + err);
+            });
+        });
+
+    } catch (e) {
+        // log errors
+        throw Error("Error while getting championship races");
+    }
+}
+
 const createChampionship = async (admin_address, organization_id, championship_data) => {
     try {
         console.log("CREATE CHAMPIONSHIP IN SERVICE");
@@ -335,6 +431,7 @@ module.exports = {
     getChampionship,
     getChampionshipDriverStanding,
     getChampionshipTeamStanding,
+    getChampionshipRaces,
 
     createChampionship
 }

@@ -45,6 +45,15 @@ const getChampionshipTeamStanding = async (req, res, next) => {
     }
 }
 
+const getChampionshipRaces = async (req, res, next) => {
+    try {
+        let races = await ChampionshipService.getChampionshipRaces(req.params.id_championship);
+        return res.status(200).json(races);
+    } catch (e){
+        return res.status(400).json({ status: 400, message: "Error getting championship races" });
+    }
+}
+
 const createChampionship = async (req, res, next) => {
     try {
         let organization_id = req.params.id_organization;
@@ -64,6 +73,7 @@ module.exports = {
     getChampionship,
     getChampionshipDriverStanding,
     getChampionshipTeamStanding,
+    getChampionshipRaces,
 
     createChampionship
 }
