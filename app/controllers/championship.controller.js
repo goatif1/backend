@@ -1,4 +1,5 @@
 const ChampionshipService = require("../services/championship.service");
+const RaceService = require("../services/race.service");
 
 const getAllChampionships = async function (req, res, next) {
     try {
@@ -66,6 +67,19 @@ const createChampionship = async (req, res, next) => {
     }
 }
 
+const createRaceRoulette = async (req, res, next) => {
+    console.log("CREATE RACE ROULETTE");
+    try {
+        let race_id = req.params.id_race;
+
+        let created = await RaceService.createRaceRoulette(race_id);
+
+        return res.status(200).json({status: "Success"});
+    } catch (e) {
+        return res.status(400).json({ status: 400, message: "Error creating roulette" });
+    }
+}
+
 module.exports = {
     getAllChampionships,
     getOrganizationChampionships,
@@ -75,5 +89,6 @@ module.exports = {
     getChampionshipTeamStanding,
     getChampionshipRaces,
 
-    createChampionship
+    createChampionship,
+    createRaceRoulette
 }
