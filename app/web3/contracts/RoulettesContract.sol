@@ -29,7 +29,7 @@ contract RoulettesContract {
         return roulettes[rouletteId].id != 0;
     }
 
-    function createRoulette (uint256 rouletteId, Option[] memory rouletteOptions) public {
+    function createRoulette (uint256 rouletteId, Option[] memory rouletteOptions) public returns (bool){
         // Check requirements
         require(rouletteId > 0);
         require(!rouletteExists(rouletteId));
@@ -46,6 +46,7 @@ contract RoulettesContract {
         }
 
         emit RouletteCreated(rouletteId);
+        return true;
     }
 
 

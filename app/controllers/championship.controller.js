@@ -71,8 +71,11 @@ const createRaceRoulette = async (req, res, next) => {
     console.log("CREATE RACE ROULETTE");
     try {
         let race_id = req.params.id_race;
+        let roulette_options = req.body.options;
 
-        let created = await RaceService.createRaceRoulette(race_id);
+        console.log("ROULETTE OPTIONS: ", roulette_options);
+
+        let created = await RaceService.createRaceRoulette(race_id, roulette_options, req.address);
 
         return res.status(200).json({status: "Success"});
     } catch (e) {

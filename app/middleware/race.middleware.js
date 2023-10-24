@@ -28,7 +28,22 @@ const raceDoesntHaveRoulette = async (req, res, next) => {
     }
 }
 
+const rouletteDataFields = async (req, res, next) => {
+    try {
+        if (!req.body) return res.status(400).json({status: 400, error: "Request body is missing"});
+
+        if (!req.body.options) return res.status(400).json({status: 400, error: "options field is missing in request body."})
+        if (req.body.options.length <= 2) return res.status(400).json({status: 400, error: "options must have at least two elements"})
+
+        next();
+
+    } catch (e){
+        return res.status(400).json({status: 400, error: "Error checking roulette options."});
+    }
+}
+
 module.exports = {
     raceHasRoulette,
-    raceDoesntHaveRoulette
+    raceDoesntHaveRoulette,
+    rouletteDataFields
 }

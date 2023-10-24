@@ -36,6 +36,7 @@ const init = () => {
     interact();
 }
 
+
 const interact = async () => {
     const providersAccounts = await web3.eth.getAccounts();
     const defaultAccount = providersAccounts[0];
@@ -74,10 +75,31 @@ const getContract__Roulettes = () => {
     return RoulettesContract;
 }
 
+const createRoulette = async (roulette_id, options, creator) => {
+    const providersAccounts = await web3.eth.getAccounts();
+    const defaultAccount = providersAccounts[0];
+
+    try {
+        const receipt = await RoulettesContract.methods.createRoulette(roulette_id, options).send({
+            from: defaultAccount,
+            gas: 1000000,
+            gasPrice: 10000000000,
+        });
+
+        console.log("RECEIPT: ", receipt);
+        return true;
+    } catch (e){
+        console.log("CreateRoulette error on Smart Contract method call.")
+        return false;
+    }
+}
+
 module.exports = {
     init,
     getAdminAddress,
-    // Rouletes
-    getContract__Roulettes
+    // Roulettes
+    getContract__Roulettes,
+    // Roulettes interface
+    createRoulette
 }
 
