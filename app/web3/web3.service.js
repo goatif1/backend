@@ -36,6 +36,19 @@ const init = () => {
     interact();
 }
 
+const test_get_roulette = async () => {
+    const providersAccounts = await web3.eth.getAccounts();
+    const defaultAccount = providersAccounts[0];
+
+    try {
+        const roulette_id = await RoulettesContract.methods.getRouletteOptions(18).call();
+
+        console.log("ROULETTE ID IS: ", roulette_id);
+
+    } catch (e) {
+        console.log("Errrrror: ", e);
+    }
+}
 
 const interact = async () => {
     const providersAccounts = await web3.eth.getAccounts();
@@ -58,7 +71,6 @@ const interact = async () => {
         const myNumberUpdated = await MyContract.methods.myNumber().call();
         console.log('my number updated value: ' + myNumberUpdated);
 
-
         const roulettesNumber = await RoulettesContract.methods.helloWorld().call();
         console.log("roulettes number is: ", roulettesNumber);
 
@@ -66,6 +78,7 @@ const interact = async () => {
         console.error(error);
     }
 }
+
 
 const getAdminAddress = () => {
     return process.env.ADMIN_ADDRESS;
@@ -79,6 +92,9 @@ const createRoulette = async (roulette_id, options, creator) => {
     const providersAccounts = await web3.eth.getAccounts();
     const defaultAccount = providersAccounts[0];
 
+    console.log("DEFAULT ACCOUNT IS: ", defaultAccount);
+
+
     try {
         const receipt = await RoulettesContract.methods.createRoulette(roulette_id, options).send({
             from: defaultAccount,
@@ -90,6 +106,7 @@ const createRoulette = async (roulette_id, options, creator) => {
         return true;
     } catch (e){
         console.log("CreateRoulette error on Smart Contract method call.")
+        console.log("EXCEPTION IS: ", e);
         return false;
     }
 }
@@ -100,6 +117,7 @@ module.exports = {
     // Roulettes
     getContract__Roulettes,
     // Roulettes interface
-    createRoulette
+    createRoulette,
+    test_get_roulette
 }
 

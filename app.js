@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 
 const Web3Service = require("./app/web3/web3.service");
+// Web3Service.test_get_roulette();
 
 const app = express();
 
