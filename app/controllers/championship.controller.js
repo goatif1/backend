@@ -55,6 +55,21 @@ const getChampionshipRaces = async (req, res, next) => {
     }
 }
 
+const getRaceRouletteOptions = async (req, res, next) => {
+    try {
+        let roulette_id = await RaceService.getRaceRoulette(req.params.id_race);
+        console.log("RACE ROULETTE ID: ", roulette_id);
+        if (!roulette_id){
+            return res.status(400).json({status: 400, message: "Error getting race roulette options."});
+        }
+        let roulette_options = await RaceService.getRaceRouletteOptions(roulette_id);
+
+        return res.status(200).json(roulette_options);
+    } catch (e) {
+        return res.status(400).json({status: 400, message: "Error getting race roulette options."});
+    }
+}
+
 const createChampionship = async (req, res, next) => {
     try {
         let organization_id = req.params.id_organization;
@@ -91,6 +106,7 @@ module.exports = {
     getChampionshipDriverStanding,
     getChampionshipTeamStanding,
     getChampionshipRaces,
+    getRaceRouletteOptions,
 
     createChampionship,
     createRaceRoulette

@@ -27,6 +27,34 @@ const getRaceRoulette = async (id_race) => {
     }
 }
 
+const getRaceRouletteOptions = async (id_roulette) => {
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT
+                roulette_option.id as option_id,
+                roulette_option.name as option_name
+            FROM roulette_option
+            WHERE roulette_option.id_roulette = $id_roulette;
+        `;
+
+        let roulette_options = await DBConn.query(sqlQuery, {
+            type: QueryTypes.SELECT,
+            bind: {
+                id_roulette: id_roulette
+            }
+        });
+
+        console.log("OPTIONS IS: ", roulette_options);
+
+        if (roulette_options && roulette_options.length > 0) return roulette_options;
+        return [];
+
+    } catch (e) {
+        throw Error("Error while getting race roulette options");
+    }
+}
+
 const createRaceRoulette = async (id_race, roulette_options, creator) => {
     try {
         let DBConn = require("../models/database.model")();
@@ -72,10 +100,6 @@ const createRaceRoulette = async (id_race, roulette_options, creator) => {
                 roulette_options[i].internal_id = option_internal_id;
             }
 
-
-            // TODO: CREATE ROULETTE ON SMART CONTRACT
-            console.log("CREATOR IS: ", creator);
-
             let options = [];
             for (const option of roulette_options){
                 options.push({id: option.internal_id, weight: option.value})
@@ -95,26 +119,6 @@ const createRaceRoulette = async (id_race, roulette_options, creator) => {
             console.log("EXCEPTION IN TRANSACTION: ", e);
             throw Error("Error on create roulette. ");
         }
-
-        // let sqlQuery = `
-        //     SELECT
-        //         roulette.id as id
-        //     FROM roulette
-        //     WHERE roulette.id_race = $id_race;
-        // `;
-
-        // let roulette = await DBConn.query(sqlQuery, {
-        //     type: QueryTypes.SELECT,
-        //     bind: {
-        //         id_race: id_race
-        //     }
-        // });
-
-        // if (roulette && roulette.length > 0) return roulette[0].id;
-        // return null;
-
-        // Test to call a contract function
-        return true;
         
     } catch (e) {
         console.log("EXCEPTION ROULETTE CREATION: ", e);
@@ -124,5 +128,6 @@ const createRaceRoulette = async (id_race, roulette_options, creator) => {
 
 module.exports = {
     getRaceRoulette,
+    getRaceRouletteOptions,
     createRaceRoulette
 }
