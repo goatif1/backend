@@ -24,17 +24,10 @@ const RoulettesContract = new web3.eth.Contract(roulettes_abi, roulettes_contrac
 // const RoulettesContract_Address = process.env.ROULETTES_CONTRACT__ADDRESS;
 
 const init = () => {
-    web3.eth
-        .getBlockNumber()
-        .then(result => {
-            console.log('Current block number: ' + result);
-        })
-        .catch(error => {
-            console.error(error);
-        });
-
-    interact();
+    console.log("ROULETTES CONTRACT METHODS: ", RoulettesContract.methods);
 }
+
+
 
 const test_get_roulette = async () => {
     const providersAccounts = await web3.eth.getAccounts();

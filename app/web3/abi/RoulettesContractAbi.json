@@ -14,6 +14,29 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "roulette_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "option_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "weight_inc",
+				"type": "uint256"
+			}
+		],
+		"name": "betRouletteOption",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "rouletteId",
 				"type": "uint256"
 			},

@@ -3,8 +3,8 @@ const { Web3 } = require('web3'); //  web3.js has native ESM builds and (`import
 const fs = require("fs");
 const path = require('node:path');
 
-const HOST_IP = "http://192.168.0.22:7545";
-// const HOST_IP = "http://192.168.1.45:7545";
+// const HOST_IP = "http://192.168.0.22:7545";
+const HOST_IP = "http://192.168.1.45:7545";
 
 // Set up a connection to the Ethereum network
 const web3 = new Web3(new Web3.providers.HttpProvider(HOST_IP));

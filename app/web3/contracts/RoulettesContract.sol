@@ -2,6 +2,13 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 contract RoulettesContract {
+    struct Bet {
+        uint256 id_roulette;
+        uint256 id_option;
+        uint256 weigth;
+        address bookie;
+    }
+
     struct Option {
         uint256 id;
         uint256 weight;
@@ -16,6 +23,7 @@ contract RoulettesContract {
 	address public immutable owner;
     mapping(uint256 => Roulette) private roulettes;
     uint256[] public roulettes_ids;
+    Bet[] private bets;
 
     // Constructor
     constructor(address _owner) {
@@ -31,6 +39,23 @@ contract RoulettesContract {
         }
         return false;
     }
+
+    function optionExists(uint256 rouletteId, uint256 optionId) private view returns (bool) {
+        // Check if the specified roulette exists
+        if (rouletteExists(rouletteId)) {
+            // Access the specific roulette using its ID
+            Roulette storage roulette = roulettes[rouletteId];
+
+            // Check if the specified option ID exists within the roulette
+            for (uint256 i = 0; i < roulette.options_ids.length; i++) {
+                if (roulette.options_ids[i] == optionId) {
+                    return true; // Option found, it exists
+                }
+            }
+        }
+        return false; // Option not found or the roulette itself doesn't exist
+    }
+
 
     function createRoulette (uint256 rouletteId, Option[] memory rouletteOptions) public returns (bool){
         // Check requirements
@@ -53,6 +78,7 @@ contract RoulettesContract {
     }
 
     function getRouletteOptions (uint256 rouletteId) public view returns (Option[] memory){
+        // Check requirements
         require(rouletteId > 0);
         require(rouletteExists(rouletteId) == true);
 
@@ -69,6 +95,22 @@ contract RoulettesContract {
         }
 
         return options;
+    }
+
+    function betRouletteOption (uint256 roulette_id, uint256 option_id, uint256 weight_inc) external payable {
+        // Check requirements
+        require(roulette_id > 0);
+        require(option_id > 0);
+        require(optionExists(roulette_id, option_id) == true);
+        require(weight_inc > 0);
+        // 1 ether is 1000000000000000000 wei
+        uint256 cost = weight_inc / 100;
+        require(msg.value >= cost);
+
+        Bet memory new_bet = Bet(roulette_id, option_id, weight_inc, msg.sender);
+        bets.push(new_bet);
+
+        roulettes[roulette_id].options[option_id].weight += weight_inc;
     }
 
 }
