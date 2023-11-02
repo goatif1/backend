@@ -5,8 +5,8 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 
 const Web3Service = require("./app/web3/web3.service");
-// Web3Service.test_get_roulette();
 Web3Service.init();
+Web3Service.subscribe();
 
 
 const app = express();
@@ -20,6 +20,7 @@ app.use(function (req, res, next) {
   
     next();
 });
+
   
 
 whitelist = ["http://localhost:8080"]

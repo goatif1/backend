@@ -5,7 +5,8 @@ const path = require('node:path');
 
 const { Web3 } = require('web3');
 // var web3 = new Web3(process.env.HOST_IP);
-const web3 = new Web3(new Web3.providers.HttpProvider(process.env.HOST_IP));
+// const web3 = new Web3(new Web3.providers.HttpProvider(process.env.HOST_IP));
+const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.HOST_IP));
 web3.eth.Contract.handleRevert = true;
 
 // My Contract
@@ -18,6 +19,7 @@ const MyContract = new web3.eth.Contract(mycontract_abi, mycontract_deployedAddr
 const roulettes_contract_deployedAddressPath = path.join(__dirname + "/bin/", 'RoulettesContractAddress.bin');
 const roulettes_contract_deployedAddress = fs.readFileSync(roulettes_contract_deployedAddressPath, 'utf8');
 const roulettes_abi = require('./abi/RoulettesContractAbi.json');
+const { error } = require('console');
 const RoulettesContract = new web3.eth.Contract(roulettes_abi, roulettes_contract_deployedAddress);
 
 // const RoulettesContract_Abi = require("./abi/RoulettesContract.json").abi;
@@ -27,21 +29,15 @@ const init = () => {
     console.log("ROULETTES CONTRACT METHODS: ", RoulettesContract.methods);
 }
 
+const subscribe = () => {
 
+    RoulettesContract.events.RouletteResult()
+    .on('data', (event) => {
+        console.log("EVENT: ", event);
+    })
 
-const test_get_roulette = async () => {
-    const providersAccounts = await web3.eth.getAccounts();
-    const defaultAccount = providersAccounts[0];
-
-    try {
-        const roulette_id = await RoulettesContract.methods.getRouletteOptions(18).call();
-
-        console.log("ROULETTE ID IS: ", roulette_id);
-
-    } catch (e) {
-        console.log("Errrrror: ", e);
-    }
 }
+
 
 const interact = async () => {
     const providersAccounts = await web3.eth.getAccounts();
@@ -87,9 +83,8 @@ const createRoulette = async (roulette_id, options, creator) => {
 
     console.log("DEFAULT ACCOUNT IS: ", defaultAccount);
 
-
     try {
-        const receipt = await RoulettesContract.methods.createRoulette(roulette_id, options).send({
+        const receipt = await RoulettesContract.methods.createRoulette(roulette_id, options, creator).send({
             from: defaultAccount,
             gas: 1000000,
             gasPrice: 10000000000,
@@ -106,11 +101,11 @@ const createRoulette = async (roulette_id, options, creator) => {
 
 module.exports = {
     init,
+    subscribe,
     getAdminAddress,
     // Roulettes
     getContract__Roulettes,
     // Roulettes interface
     createRoulette,
-    test_get_roulette
 }
 
