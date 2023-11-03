@@ -3,7 +3,9 @@ const crypto = require('crypto');
 
 const getNonce = async function (req, res, next) {
     try{
+        console.log("GET NONCE RECEIVED")
         let user = await UserService.getUser(req.public_address);
+        console.log("user: ", user)
         let nonce = null;
         if (!user){
             const new_nonce = crypto.randomInt(1, 4294967290);
@@ -20,6 +22,7 @@ const getNonce = async function (req, res, next) {
         }
         return res.status(200).json({ status: 200, data: nonce, message: "Successfully Nonce Retrieved" });
     } catch (e) {
+        console.log("exception nonce: ", e);
         return res.status(400).json({ status: 400, message: e.message });
     }
 }

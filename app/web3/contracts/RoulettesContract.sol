@@ -170,7 +170,7 @@ contract RoulettesContract {
 
         spinned_results[roulette_id] = id_result;
 
-        emit RouletteResult(roulette_id, id_result);
+        // emit RouletteResult(roulette_id, id_result);
 
         return id_result;
     }

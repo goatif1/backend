@@ -6,7 +6,6 @@ const cookieParser = require('cookie-parser');
 
 const Web3Service = require("./app/web3/web3.service");
 Web3Service.init();
-Web3Service.subscribe();
 
 
 const app = express();

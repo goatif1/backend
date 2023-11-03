@@ -29,16 +29,6 @@ const init = () => {
     console.log("ROULETTES CONTRACT METHODS: ", RoulettesContract.methods);
 }
 
-const subscribe = () => {
-
-    RoulettesContract.events.RouletteResult()
-    .on('data', (event) => {
-        console.log("EVENT: ", event);
-    })
-
-}
-
-
 const interact = async () => {
     const providersAccounts = await web3.eth.getAccounts();
     const defaultAccount = providersAccounts[0];
@@ -67,7 +57,6 @@ const interact = async () => {
         console.error(error);
     }
 }
-
 
 const getAdminAddress = () => {
     return process.env.ADMIN_ADDRESS;
@@ -101,7 +90,6 @@ const createRoulette = async (roulette_id, options, creator) => {
 
 module.exports = {
     init,
-    subscribe,
     getAdminAddress,
     // Roulettes
     getContract__Roulettes,

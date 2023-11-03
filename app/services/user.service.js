@@ -35,6 +35,7 @@ const getUser = async function (address){
 
     } catch (e) {
         // log errors
+        console.log("Get user exception: ", e);
         throw Error("Error while getting user data");
     }
 }
