@@ -1,4 +1,3 @@
-const AuthService = require("../services/auth.service");
 const UserService = require("../services/user.service");
 const ethUtil = require('ethereumjs-util');
 const jwt = require('jsonwebtoken');
@@ -58,6 +57,36 @@ const authenticate = async function (req, res, next) {
     }
 }
 
+const login = async (req, res, next) => {
+
+}
+
+const register = async (req, res, next) => {
+    try {
+        const { email, username: nickname, password } = req.body;
+
+        // Check if user already exists
+
+        const existingUser = UserService.existsUser(email, nickname);
+        if (existingUser) {
+            return res.status(409).json({ error: 'User already exists' });
+        }
+
+        // Hash the password using bcrypt
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Save user data (in a real application, you would store this in a database)
+        UserService.register(email, nickname, hashedPassword);
+
+        return res.status(201).json({ message: 'User registered successfully' });
+
+
+    } catch(e) {
+        console.error(e);
+        res.status(500).json({error: "Internal server error"});
+    }
+}
+
 const stringToHex = (str) => {
     const encoder = new TextEncoder();
     const data = encoder.encode(str);
@@ -65,5 +94,7 @@ const stringToHex = (str) => {
 }
 
 module.exports = {
-    authenticate
+    authenticate,
+
+    register
 }

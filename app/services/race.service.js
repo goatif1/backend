@@ -1,6 +1,4 @@
 const { QueryTypes } = require("sequelize");
-const { getContract__Roulettes, createRoulette } = require("../web3/web3.service");
-
 
 const getRaceRoulette = async (id_race) => {
     try {
@@ -86,31 +84,9 @@ const createRaceRoulette = async (id_race, roulette_options, creator) => {
                     $name
                 );
             `;
-            for (let i = 0; i < roulette_options.length; i++){
-                let roulette_option_res = await DBConn.query(sqlQuery, {
-                    type: QueryTypes.INSERT,
-                    transaction: transaction,
-                    bind: {
-                        id_roulette: roulette_id,
-                        name: roulette_options[i].name
-                    }
-                });
+            
 
-                let option_internal_id = roulette_option_res[0];
-                roulette_options[i].internal_id = option_internal_id;
-            }
-
-            let options = [];
-            for (const option of roulette_options){
-                options.push({id: option.internal_id, weight: option.value})
-            }
-
-            let created = await createRoulette(roulette_id, options, creator);
-            if (created){
-                await transaction.commit();
-            } else {
-                throw Error("SC createRoulette error");
-            }
+            //  TODO: insert options in table
 
             return true;
 

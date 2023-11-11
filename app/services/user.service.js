@@ -1,19 +1,19 @@
 let { QueryTypes } = require("sequelize");
 
 // GET
-const getUser = async function (address){
+const getUser = async function (id){
     try {
         let DBConn = require("../models/database.model")();
         let sqlQuery = `
             SELECT
-                user.address as address,
-                user.nonce as nonce,
+                user.id as id,
+                user.email as user.email,
+                user.password as password,
                 user.nickname as nickname,
                 user.dateofcreation as dateofcreation,
-                user.invitation_code as invitation_code,
                 user.url_image as url_image
             FROM user
-            WHERE user.address = $address
+            WHERE user.id = $id
             LIMIT 1;
         `;
 
@@ -21,7 +21,7 @@ const getUser = async function (address){
             DBConn.query(sqlQuery, {
                 type: QueryTypes.SELECT,
                 bind: {
-                    address: address
+                    id: id
                 }
             })
             .then((users) => {
@@ -40,55 +40,46 @@ const getUser = async function (address){
     }
 }
 
-const getNonce = async function (address){
+const existsUser = async (email, nickname) => {
     try {
         let DBConn = require("../models/database.model")();
         let sqlQuery = `
-            SELECT
-                user.nonce
+            SELECT id
             FROM user
-            WHERE user.address = $address;
+            WHERE email = $email OR nickname = $nickname;
         `;
 
-        return new Promise( function(resolve, reject) {
-            DBConn.query(sqlQuery, {
-                type: QueryTypes.SELECT,
-                bind: {
-                    address: address
-                }
-            })
-            .then((users_nonces) => {
-                resolve(users_nonces && users_nonces.length > 0 ? users_nonces[0].nonce : null);
-            })
-            .catch((err) => {
-                reject(err);
-                throw Error("UserService. Error while getting nonce. " + err);
-            });
+        let find_res = await DBConn.query(sqlQuery, {
+            type: QueryTypes.SELECT,
+            bind: {
+                email: email,
+                nickname: nickname
+            }
         });
 
-    } catch (e) {
-        // log errors
-        throw Error("Error while getting nonce");
+        return find_res && find_res.length > 0;
+
+    } catch(e){
+        throw Error("Error while finding user.");
     }
 }
 
 // POST
-const createUser = async function (address, nonce, nickname, invitation_code){
+const register = async function (email, nickname, hashedPassword){
     try {
         let DBConn = require("../models/database.model")();
         let sqlQuery = `
-            INSERT INTO user (address, nonce, nickname, invitation_code)
-            VALUES ($address, $nonce, $nickname, $invitation_code);
+            INSERT INTO user (email, password, nickname)
+            VALUES ($email, $hashedPassword, $nickname);
         `;
 
         return new Promise( function(resolve, reject) {
             DBConn.query(sqlQuery, {
                 type: QueryTypes.INSERT,
                 bind: {
-                    address: address,
-                    nonce: nonce,
-                    nickname: nickname,
-                    invitation_code: invitation_code
+                    email: email,
+                    hashedPassword: hashedPassword,
+                    nickname: nickname
                 }
             })
             .then((user) => {
@@ -108,7 +99,8 @@ const createUser = async function (address, nonce, nickname, invitation_code){
 
 module.exports = {
     getUser,
-    getNonce,
 
-    createUser
+    existsUser,
+
+    register
 }
