@@ -64,6 +64,30 @@ const existsUser = async (email, nickname) => {
     }
 }
 
+const nicknameIsAvailable = async (nickname) => {
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT nickname
+            FROM user
+            WHERE nickname = $nickname;
+        `;
+
+        let find_res = await DBConn.query(sqlQuery, {
+            type: QueryTypes.SELECT,
+            bind: {
+                nickname: nickname
+            }
+        });
+
+        if (find_res && find_res.length > 0) return false;
+        return true;
+
+    } catch (e) {
+
+    }
+}
+
 // POST
 const register = async function (email, nickname, hashedPassword){
     try {
@@ -101,6 +125,7 @@ module.exports = {
     getUser,
 
     existsUser,
+    nicknameIsAvailable,
 
     register
 }

@@ -61,6 +61,21 @@ const login = async (req, res, next) => {
 
 }
 
+const isNicknameAvailable = async (req, res, next) => {
+    try {
+        const {nickname} = req.query;
+        console.log("Nickname is: ", nickname);
+
+        if (!nickname) return res.status(400).json({error: "Nickname missing in request query."});
+
+        let isAvailable = await UserService.nicknameIsAvailable(nickname);
+
+        return res.status(200).json({available: isAvailable});
+    } catch(e) {
+        res.status(500).json({error: "Internal server error"});
+    }
+}
+
 const register = async (req, res, next) => {
     try {
         const { email, username: nickname, password } = req.body;
@@ -80,7 +95,6 @@ const register = async (req, res, next) => {
 
         return res.status(201).json({ message: 'User registered successfully' });
 
-
     } catch(e) {
         console.error(e);
         res.status(500).json({error: "Internal server error"});
@@ -96,5 +110,6 @@ const stringToHex = (str) => {
 module.exports = {
     authenticate,
 
+    isNicknameAvailable,
     register
 }
