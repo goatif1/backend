@@ -46,7 +46,7 @@ const getUser_byEmail = async function (email){
         let sqlQuery = `
             SELECT
                 user.id as id,
-                user.email as user.email,
+                user.email as email,
                 user.password as password,
                 user.nickname as nickname,
                 user.dateofcreation as dateofcreation,
@@ -129,7 +129,37 @@ const nicknameIsAvailable = async (nickname) => {
 }
 
 // POST
-const register = async function (email, nickname, hashedPassword){
+const login = async (email, hashedPassword) => {
+    try {
+        let DBConn = require("../models/database.model")();
+        let sqlQuery = `
+            SELECT
+                user.id as id,
+                user.email as email,
+                user.password as password
+            FROM user
+            WHERE user.email = $email AND user.password = $password;
+        `;
+
+        let users_res = await DBConn.query(sqlQuery, {
+            type: QueryTypes.SELECT,
+            bind: {
+                email: email,
+                password: hashedPassword
+            }
+        });
+
+        if (users_res && users_res.length > 0) return true;
+
+        return false;
+
+    } catch (e) {
+        // log errors
+        throw Error("Error while loggin user. " + e);
+    }
+}
+
+const register = async (email, nickname, hashedPassword) => {
     try {
         let DBConn = require("../models/database.model")();
         let sqlQuery = `
@@ -168,5 +198,6 @@ module.exports = {
     existsUser,
     nicknameIsAvailable,
 
+    login,
     register
 }

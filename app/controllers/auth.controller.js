@@ -60,12 +60,34 @@ const authenticate = async function (req, res, next) {
 
 const login = async (req, res, next) => {
     try {
-        let email = req.body.email;
-        let password = req.body.password;
+        if (!req.body){
+            return res.status(400).json({ status: 400, message: "Missing request body to authenticate." });
+        }
+        if (!req.body.email){
+            return res.status(400).json({ status: 400, message: "Missing email in request body to authenticate." });
+        }
+        if (!req.body.password){
+            return res.status(400).json({ status: 400, message: "Missing password in request body to authenticate." });
+        }
 
-        
+        const email = req.body.email;
+        const password = req.body.password;
+
+        let user = await UserService.getUser_byEmail(email);
+        if (!user){
+            return res.status(400).json({status: "Login failed. Incorrect email or password."});
+        }
+
+        let password_ok = bcrypt.compareSync(password, user.password);
+
+        if (password_ok){
+            return res.status(200).json({status: "Success"});
+        } else {
+            return res.status(400).json({status: "Login failed. Incorrect email or password."});
+        }
 
     } catch(e) {
+        console.log("Exception: ", e);
         return res.status(400).json({error: "Internal error. Could not login"})
     }
 }
@@ -120,5 +142,7 @@ module.exports = {
     authenticate,
 
     isNicknameAvailable,
+
+    login,
     register
 }
